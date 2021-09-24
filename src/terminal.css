@@ -1,0 +1,34 @@
+
+:root{
+    --terminal-bg: #A0A0FF;
+    --terminal-alt: #5D5DDE;
+}
+
+@font-face{
+    font-family: terminalFont;
+    src: url("../assets/C64_Pro_Mono-STYLE.otf")
+}
+
+body,html{
+    height: 100%;
+    font-family: terminalFont;
+    background-color: var(--terminal-bg);
+    margin: 0;
+    padding: 0;
+}
+
+.screen{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.terminal{
+    background-color: var(--terminal-alt);
+    color: var(--terminal-bg);
+    padding: 10px;
+    font-size: 2.25vh;
+    width: 70%;
+    height: 70%;
+}
