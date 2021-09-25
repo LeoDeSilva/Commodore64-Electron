@@ -11,6 +11,7 @@
 
 body,html{
     height: 100%;
+    cursor: none;
     font-family: terminalFont;
     background-color: var(--terminal-bg);
     margin: 0;
@@ -29,7 +30,45 @@ body,html{
     color: var(--terminal-bg);
     padding: 10px;
     font-size: 2.25vh;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    border-radius: 10px;
     width: 70%;
     height: 70%;
     box-shadow: 0px 0px 10px 0px rgb(80,80,222,0.5);
 }
+
+.cmd-line{
+    display: flex;
+}
+
+input, [contenteditable]{
+    outline: none;
+    border: none;
+    width: 100%;
+    max-width: 100%;
+    text-transform: uppercase;
+    background-color: transparent;
+    font-family: terminalFont;
+    font-size: 2.25vh;
+    color: var(--terminal-bg);
+    resize: none;
+    min-height:50px;
+    height:auto;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+[contenteditable]:focus{
+    border: none;
+    outline: 0px solid transparent !important;
+}
+
+.mode{
+    position:absolute;
+    right: 5px;
+    bottom: 5px;
+    color: var(--terminal-alt);
+}
+
+

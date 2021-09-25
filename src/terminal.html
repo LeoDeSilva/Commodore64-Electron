@@ -4,18 +4,25 @@
 <head>
   <title>Comador 64</title>
   <link rel="stylesheet" href="terminal.css">
+  <link rel="stylesheet" href="scanlines.css">
   </link>
 </head>
 
 <body>
-  <div class="screen">
+  <div id="screen" class="screen crt">
     <div class="terminal">
-      <span>
-        >
-        <input>
+      <span class="commands" id="commands"></span>
+      <span class="cmd-line">
+        <div spellcheck="false" contenteditable="true" class=".textarea" id="cmd"></div>
       </span>
+
+      <div id="mode" class="mode">
+        &#60;CMD&#62;
+      </div>
     </div>
   </div>
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="terminal.js"></script>
 
 </html>
