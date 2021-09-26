@@ -1,0 +1,29 @@
+[data-theme="lightgreen"] {
+    --terminal-bg: #A0FFB5;
+    --terminal-alt: #32353C;
+}
+
+[data-theme="green"] {
+    --terminal-bg: #5DCA42;
+    --terminal-alt: #32353C;
+}
+
+[data-theme="lightorange"]{
+    --terminal-bg: #FFAD4E;
+    --terminal-alt: #32353C;
+}
+
+[data-theme="orange"]{
+    --terminal-bg: #F89929;
+    --terminal-alt: #32353C;
+}
+
+[data-theme="dark"]{
+    --terminal-bg: white;
+    --terminal-alt: #32353C;
+}
+
+[data-theme="light"]{
+    --terminal-bg: #32353C;
+    --terminal-alt: white;
+}

@@ -1,5 +1,5 @@
 {
-    "name": "comadore_64",
+    "name": "commodore_64",
     "version": "1.0.0",
     "description": "C64 recreation in electron js",
     "main": "src/index.js",
@@ -8,12 +8,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/leoDesilva/Comador64-Electron.git"
+        "url": "git+https://github.com/leoDesilva/Commodore64-Electron.git"
     },
     "author": "Leo De Silva",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/leoDesilva/Comador64-Electron/issues"
+        "url": "https://github.com/leoDesilva/Commodore64-Electron/issues"
     },
-    "homepage": "https://github.com/leoDesilva/Comador64-Electron#readme"
+    "homepage": "https://github.com/leoDesilva/Commodore64-Electron#readme"
 }

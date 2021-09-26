@@ -11,6 +11,10 @@ function addCMD(cmd) {
     commands.innerHTML += `<div class="cmd"> ${cmd} </div>`
 }
 
+function dataTheme(color) {
+    document.documentElement.setAttribute("data-theme", color)
+}
+
 function findIndexFromKey(array, property) {
     for (let i = 0; i < array.length; i++) {
         if (array[i].number == property) {
@@ -38,11 +42,20 @@ class Terminal {
         addCMD(cmd)
 
         if (this.mode == "CMD") {
-            if (cmd == "NEW") {this.newProgram()}
-            else if (cmd == "CLEAR") {this.clearScreen()}
-            else if (cmd == "LIST") {this.list()}
-            else if (cmd == "RUN") {this.runProgram()}
-            else if (cmd == "CRT") {this.toggleScanlines()}
+            if (cmd == "NEW") {
+                this.newProgram()
+            } else if (cmd == "CLEAR") {
+                this.clearScreen()
+            } else if (cmd == "LIST") {
+                this.list()
+            } else if (cmd == "RUN") {
+                this.runProgram()
+            } else if (cmd == "CRT") {
+                this.toggleScanlines()
+            } else if (cmd.split("\ ")[0] == "COLOR") {
+                dataTheme(cmd.split("\ ")[1].toLowerCase())
+            }
+
             else {
                 addCMD("<br>")
                 addCMD("SYNTAX ERROR, COMMAND NOT FOUND")

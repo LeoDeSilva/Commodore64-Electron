@@ -140,7 +140,8 @@
   opacity: 0;
   z-index: 2;
   pointer-events: none;
-  animation: flicker 0.55s infinite;
+  /*animation: flicker 0.55s infinite;*/
+  animation: flicker 2s infinite;
 }
 .crt::before {
   content: " ";
@@ -156,5 +157,6 @@
   pointer-events: none;
 }
 .crt {
-  animation: textShadow 1.6s infinite;
+    /*animation: textShadow 1.6s infinite;*/
+    animation: textShadow 5.6s infinite;
 }
