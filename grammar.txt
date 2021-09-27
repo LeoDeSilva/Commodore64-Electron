@@ -1,0 +1,33 @@
+prog : expr*
+
+expr : KEYWORD:VAR IDENTIFIER EQ expr 
+     : comp (AND | OR) comp 
+
+comp : (NOT) comp 
+     : artih (EE|LT|GT|LTE|GTE) arith 
+
+arith :  term ((PLUS | MINUS)) term)*/def 
+
+term : factor ((MUL | DIVICE) factor)*
+
+factor : PLUS | MINUS factor 
+
+power : call (POW factor)
+
+call : atom (expr (COMMA expr)*)
+
+atom : INT|FLOAT|INDENTIFIER 
+     : LPAREN expr RPAREN 
+     : if-expr 
+     : func-def
+     : for-expr 
+
+if-expr : if expr then expr
+        : elif expr then expr 
+        : else expr 
+
+for-expr : for IDENTIFIER EQ expr to expr 
+         : step ?
+         : prog NEXT 
+
+

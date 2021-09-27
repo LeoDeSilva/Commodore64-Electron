@@ -27,3 +27,8 @@
     --terminal-bg: #32353C;
     --terminal-alt: white;
 }
+
+[data-theme="powershell"]{
+    --terminal-bg: white;
+    --terminal-alt: #5D5DDE;
+}
