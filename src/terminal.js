@@ -1,4 +1,3 @@
-const lexerFile = require('./lexer')
 const cmd = document.getElementById("cmd");
 const commands = document.getElementById("commands");
 const modeElement = document.getElementById("mode");
@@ -31,8 +30,9 @@ class Terminal {
         this.program = [];
     }
 
-    evalCMD(cmd) {
-        addCMD(cmd);
+    evalCMD(command) {
+        let cmd = command.trim()
+        addCMD(command);
 
         if (this.mode == "CMD") {
             if (cmd == "NEW") {
@@ -73,10 +73,13 @@ class Terminal {
     }
 
     runProgram() {
+        let lex = new Lexer(this.program)
+        let tokens = lex.lex()
+
+        let parse = new Parser(tokens)
+        let ast = parse.parse()
+
         this.enterCMD();
-        const lex = new Lexer(program)
-        tokens = lex.lex()
-        lex.printTokens(tokens)
     }
 
     list() {
@@ -141,19 +144,17 @@ class Terminal {
 
 const Prompt = new Terminal();
 
-//let program = [
-//{number: 10, line: "PRINT(\"HELLO WOLRD\")"},
-//{number: 20, line: "GOTO 10"}
-//]
 let test_program = [
     {number: 10, line: "VAR CT = 0"},
     {number: 15, line: 'PRINT("HELLO WORLD")'},
     {number: 20, line: "GOTO 10"}
 ]
 
-let test_lexer = new Lexer(test_program)
-let test_tokens = test_lexer.lex()
-lexer.printTokens(test_tokens)
+//let test_lexer = new Lexer(test_program)
+//let test_tokens = test_lexer.lex()
+
+//let test_parser = new Parser(test_tokens)
+//let ast = test_parser.parse()
 
 
 cmd.onkeypress = function (e) {

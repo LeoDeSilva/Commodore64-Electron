@@ -2,9 +2,10 @@ prog : expr*
 
 expr : KEYWORD:VAR IDENTIFIER EQ expr 
      : comp (AND | OR) comp 
+     : IDENTIFIER(expr,expr)
 
 comp : (NOT) comp 
-     : artih (EE|LT|GT|LTE|GTE) arith 
+     : arith ((EE|LT|GT|LTE|GTE) arith)
 
 arith :  term ((PLUS | MINUS)) term)*/def 
 

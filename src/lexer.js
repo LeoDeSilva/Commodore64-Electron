@@ -1,3 +1,4 @@
+const commands = document.getElementById("commands")
 const LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
 const DIGITS = "0123456789"
 
@@ -5,7 +6,7 @@ let TT_INT = "INT"
 let TT_STRING = "STRING"
 let TT_IDENTIFIER = "IDENTIFIER"
 let TT_KEYWORD = "KEYWORD"
-let TT_PLUS = "PLUS"
+let TT_ADD = "ADD"
 let TT_MINUS = "MINUS"
 let TT_MUL = "MUL"
 let TT_DIV = "DIV"
@@ -41,6 +42,10 @@ let KEYWORDS = [
 ]
 
 
+function output(cmd) {
+    commands.innerHTML += `<div class="cmd"> ${cmd} </div>`;
+}
+
 class Token {
     constructor(type_, value_ = null) {
         this.type = type_;
@@ -52,7 +57,8 @@ class Token {
     }
 
     print() {
-        console.log(this.type, ":", this.value)
+        output(this.type + ":" + this.value);
+        console.log(this.type + ":" + this.value)
     }
 }
 
@@ -68,7 +74,7 @@ class Lexer {
 
     formatProgram(program) {
         let code = program.map(a => a.line)
-        return code.join("~")
+        return code.join(":")
     }
 
     advance() {
@@ -85,7 +91,6 @@ class Lexer {
 
     lex() {
         let tokens = []
-        console.log(this.program)
         while (this.currentChar != null) {
             if (this.currentChar == "+") {
                 tokens.push(new Token(TT_ADD, this.currentChar))
@@ -126,8 +131,11 @@ class Lexer {
             else if (this.currentChar == "^") {
                 tokens.push(new Token(TT_POW, this.currentChar))
             }
-            else if (this.currentChar == "~") {
-                tokens.push(new Token(TT_EOL, "~"))
+            else if (this.currentChar == ",") {
+                tokens.push(new Token(TT_COMMA, this.currentChar))
+            }
+            else if (this.currentChar == ":") {
+                tokens.push(new Token(TT_EOL, ":"))
             }
 
             else if (this.currentChar == '"' || this.currentChar == "'") {
@@ -148,7 +156,9 @@ class Lexer {
             this.advance()
         }
 
-        tokens.push(new Token(TT_EOF))
+        tokens.push(new Token(TT_EOL, ":"))
+
+        //tokens.push(new Token(TT_EOF))
         return tokens
     }
 
