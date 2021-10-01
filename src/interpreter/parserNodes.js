@@ -5,27 +5,12 @@ class ProgramNode {
         this.type = "PROGRAM"
         this.exprs = exprs;
     }
-
-    printToken() {
-        console.log(this.type, this.exprs)
-        //for (let i = 0; i < this.exprs.length; i++) {
-        //try {
-        //this.exprs[i].printToken()
-        //}
-        //catch {
-
-        //}
-        //}
-    }
 }
 
 class NumberNode {
     constructor(tok) {
         this.type = "INT"
         this.tok = tok
-    }
-    printToken() {
-        console.log(this.type, this.tok)
     }
 }
 
@@ -34,19 +19,12 @@ class StringNode {
         this.type = "STRING"
         this.tok = tok
     }
-    printToken() {
-        console.log(this.type, this.tok)
-    }
 }
 
 class VarAccessNode {
     constructor(var_name_tok) {
         this.type = "VAR_ACCESS"
         this.var_name_tok = var_name_tok
-    }
-
-    printToken() {
-        console.log(this.type, this.var_name_tok)
     }
 }
 
@@ -55,9 +33,6 @@ class VarAssignNode {
         this.type = "VAR_ASSIGN"
         this.var_name_tok = var_name_tok;
         this.value_node = value_node;
-    }
-
-    printToken() {
     }
 }
 
@@ -68,10 +43,6 @@ class BinOpNode {
         this.op_tok = op_tok;
         this.right_node = right_node;
     }
-
-    printToken() {
-        console.log(this.type, this.left_node, this.op_tok, this.right_node);
-    }
 }
 
 class UnaryOpNode {
@@ -80,8 +51,12 @@ class UnaryOpNode {
         this.op_tok = op_tok;
         this.node = node
     }
+}
 
-    printToken() {
-        console.log(this.type + ":" + this.op_tok + this.node)
+class FunctionCallNode {
+    constructor(var_name_tok, parameters) {
+        this.var_name_tok = var_name_tok;
+        this.parameters = parameters;
     }
 }
+

@@ -1,0 +1,23 @@
+# Include Line numers:
+
+## Parser + Lexer
+{ 
+    lineNumber:INT,
+    nodes: Node[]
+}
+
+prog = {
+    "10": lineTokens,
+}
+
+while lineIndex < lines.length:
+    tokens = []
+
+    while curentTok != null:
+        tokens.push(lex())
+        advance()
+
+    prog[lines[lineIndex].number] = tokens 
+    advanceLine()
+    
+

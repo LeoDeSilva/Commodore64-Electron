@@ -38,7 +38,8 @@ let KEYWORDS = [
     "TO",
     "STEP",
     "NEXT",
-    "GOTO"
+    "GOTO",
+    "END"
 ]
 
 
@@ -64,12 +65,16 @@ class Token {
 
 class Lexer {
     constructor(program) {
-        this.program = this.formatProgram(program);
+        this.program = program
+        this.formattedProgram = this.formatProgram(program);
         this.index = 0
+        this.lineIndex = 0
+        this.lineNumber = this.program[this.lineIndex].number
+        this.line = this.program[this.lineIndex].line
 
         this.prevChar = null
-        this.currentChar = this.program[this.index];
-        this.nextChar = this.program[this.index + 1]
+        this.currentChar = this.formattedProgram[this.index];
+        this.nextChar = this.formattedProgram[this.index + 1]
     }
 
     formatProgram(program) {
@@ -79,17 +84,121 @@ class Lexer {
 
     advance() {
         this.index++;
-        try {this.currentChar = this.program[this.index];}
+        try {this.currentChar = this.line[this.index];}
         catch {this.currentChar = null;}
+    }
+
+    advanceLine() {
+        this.lineIndex++;
+        try {
+            this.lineNumber = this.program[this.lineIndex].number
+            this.line = this.program[this.lineIndex].line
+            this.index = 0;
+            this.currentChar = this.line[this.index]
+        }
+        catch {
+            this.index = null;
+            this.currentChar = null
+            this.lineNumber = null
+            this.line = null
+        }
     }
 
     retreat() {
         this.index--;
-        try {this.currentChar = this.program[this.index];}
+        try {this.currentChar = this.line[this.index];}
         catch {this.currentChar = null;}
     }
 
     lex() {
+        let program = []
+        while (this.line != null) {
+            let lineProg = {
+                number: this.lineNumber,
+                tokens: []
+            }
+            while (this.currentChar != null) {
+                if (this.currentChar == " ") {this.advance(); continue;}
+                let token = this.lexToken()
+                lineProg.tokens.push(token)
+                this.advance()
+            }
+
+            lineProg.tokens.push(new Token(TT_EOL, ":"))
+
+            program[this.lineNumber] = lineProg
+            this.advanceLine()
+        }
+
+        return program
+    }
+
+    lexToken() {
+        if (this.currentChar == "+") {
+            return new Token(TT_ADD, this.currentChar)
+        }
+        else if (this.currentChar == "-") {
+            return new Token(TT_MINUS, this.currentChar)
+        }
+        else if (this.currentChar == "*") {
+            return new Token(TT_MUL, this.currentChar)
+        }
+        else if (this.currentChar == "/") {
+            return new Token(TT_DIV, this.currentChar)
+        }
+        else if (this.currentChar == "(") {
+            return new Token(TT_LPAREN, this.currentChar)
+        }
+        else if (this.currentChar == ")") {
+            return new Token(TT_RPAREN, this.currentChar)
+        }
+        else if (this.currentChar == "[") {
+            return new Token(TT_LSQUARE, this.currentChar)
+        }
+        else if (this.currentChar == "]") {
+            return new Token(TT_RSQUARE, this.currentChar)
+        }
+        else if (this.currentChar == "!") {
+            return new Token(TT_NOT, this.currentChar)
+        }
+        else if (this.currentChar == ">") {
+            return this.makeComparison(">")
+        }
+        else if (this.currentChar == "<") {
+            return this.makeComparison("<")
+        }
+        else if (this.currentChar == "=") {
+            return this.makeComparison("=")
+        }
+        else if (this.currentChar == "^") {
+            return new Token(TT_POW, this.currentChar)
+        }
+        else if (this.currentChar == ",") {
+            return new Token(TT_COMMA, this.currentChar)
+        }
+        else if (this.currentChar == ":") {
+            this.advanceLine()
+            return new Token(TT_EOL, ":")
+        }
+
+        else if (this.currentChar == '"' || this.currentChar == "'") {
+            return new Token(TT_STRING, this.makeString())
+        }
+        else if (LETTERS.includes(this.currentChar)) {
+            let tok_name = this.make(LETTERS)
+            if (KEYWORDS.includes(tok_name)) {
+                return new Token(TT_KEYWORD, tok_name)
+            } else {
+                return new Token(TT_IDENTIFIER, tok_name)
+            }
+        }
+        else if (DIGITS.includes(this.currentChar)) {
+            return new Token(TT_INT, parseInt(this.make(DIGITS)))
+        }
+
+    }
+
+    lexNoLINE() {
         let tokens = []
         while (this.currentChar != null) {
             if (this.currentChar == "+") {
@@ -135,6 +244,7 @@ class Lexer {
                 tokens.push(new Token(TT_COMMA, this.currentChar))
             }
             else if (this.currentChar == ":") {
+                this.advanceLine()
                 tokens.push(new Token(TT_EOL, ":"))
             }
 
@@ -184,7 +294,7 @@ class Lexer {
 
     makeComparison(char) {
         this.advance()
-        if (self.currentChar == "=") {
+        if (this.currentChar == "=") {
             if (char == ">") {return new Token(TT_GTE, ">=")}
             else if (char == "<") {return new Token(TT_LTE, "<=")}
             else if (char == "=") {return new Token(TT_EE, "==")}

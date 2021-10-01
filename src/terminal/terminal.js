@@ -1,5 +1,4 @@
 const cmd = document.getElementById("cmd");
-const commands = document.getElementById("commands");
 const modeElement = document.getElementById("mode");
 const screen = document.getElementById("screen");
 
@@ -75,9 +74,11 @@ class Terminal {
     runProgram() {
         let lex = new Lexer(this.program)
         let tokens = lex.lex()
+        console.log(tokens)
 
         let parse = new Parser(tokens)
         let ast = parse.parse()
+        console.log(ast)
 
         this.enterCMD();
     }
@@ -143,19 +144,6 @@ class Terminal {
 }
 
 const Prompt = new Terminal();
-
-let test_program = [
-    {number: 10, line: "VAR CT = 0"},
-    {number: 15, line: 'PRINT("HELLO WORLD")'},
-    {number: 20, line: "GOTO 10"}
-]
-
-//let test_lexer = new Lexer(test_program)
-//let test_tokens = test_lexer.lex()
-
-//let test_parser = new Parser(test_tokens)
-//let ast = test_parser.parse()
-
 
 cmd.onkeypress = function (e) {
     if (e.keyCode == 13) {

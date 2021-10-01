@@ -10,7 +10,7 @@ function createWindow() {
         }
     })
 
-    win.loadFile("src/terminal.html")
+    win.loadFile("src/terminal/terminal.html")
 }
 
 app.whenReady().then(() => {

@@ -2,6 +2,7 @@ class Parser {
     constructor(program) {
         this.program = program;
         this.i = 0;
+        this.lineIndex = 0
         this.currentNode = this.program[this.i]
     }
 
@@ -19,6 +20,10 @@ class Parser {
 
 
     parse() {
+
+    }
+
+    parseOLD() {
         let ast = new ProgramNode([])
 
         while (this.currentNode != null) {
@@ -28,41 +33,65 @@ class Parser {
             this.advance()
         }
 
-        ast.printToken()
         return ast
     }
 
     parseExpr() {
         while (this.currentNode != null && this.currentNode.type != TT_EOL) {
-
-            if (this.currentNode.matches(TT_KEYWORD, "VAR")) {
-                this.advance()
-
-                if (this.currentNode.type != TT_IDENTIFIER) {
-                    output("EXPECTED IDENTIFIER VAR ASSIGNMENT")
-                    return null
+            if (this.currentNode.type == TT_KEYWORD) {
+                if (this.currentNode.matches(TT_KEYWORD, "VAR")) {
+                    this.advance()
+                    return this.parseAssignment()
                 }
 
-                let var_name = this.currentNode
+                if (this.currentNode.matches(TT_KEYWORD, "GOTO")) {
+                    let parameters = []
+                    this.advance()
 
-                this.advance()
+                    if (this.currentNode.type == TT_LPAREN) {
+                        parameters = this.parseParameters()
+                    } else {
+                        parameters = new ProgramNode([this.parseArith()])
+                    }
 
-                if (this.currentNode.type != TT_EQ) {
-                    output("EXPECTED EQUALS VAR ASSIGNMENT")
-                    return null
+                    this.advance()
+                    return new FunctionCallNode("GOTO", parameters)
                 }
-
-                this.advance()
-
-                let var_expr = this.parseArith()
-                return new VarAssignNode(var_name, var_expr)
             }
             else {
-                let arith = this.parseArith()
-                return arith
+                if (this.currentNode.type == TT_IDENTIFIER) {
+                    if (this.program[this.i + 1].type == TT_EQ) {
+                        return this.parseAssignment()
+                    }
+                }
+
+                return this.parseArith()
 
             }
         }
+    }
+
+    parseAssignment() {
+
+        if (this.currentNode.type != TT_IDENTIFIER) {
+            output("EXPECTED IDENTIFIER VAR ASSIGNMENT")
+            return null
+        }
+
+        let var_name = this.currentNode.value
+
+        this.advance()
+
+        if (this.currentNode.type != TT_EQ) {
+            output("EXPECTED EQUALS VAR ASSIGNMENT")
+            return null
+        }
+
+        this.advance()
+
+        let var_expr = this.parseArith()
+        return new VarAssignNode(var_name, var_expr)
+
     }
 
     parseArith() {
@@ -104,7 +133,7 @@ class Parser {
                 this.advance()
                 let factorB = this.parseFactor()
                 this.advance()
-                let binary_op = new BinOpNode(factorA, TT_DIV, factorB)
+                //let binary_op = new BinOpNode(factorA, TT_DIV, factorB)
                 return binary_op
             }
             else {
@@ -115,10 +144,42 @@ class Parser {
         return factorA
     }
 
+    parseParameters() {
+        let parameters = new ProgramNode([])
+        this.advance()
+
+        if (this.currentNode.type == TT_RPAREN) {
+            return parameters
+        }
+        while (this.currentNode != null && this.currentNode.type != TT_RPAREN && this.currentNode.type != TT_EOL) {
+            if (this.currentNode.type != TT_COMMA) {
+                parameters.exprs.push(this.parseExpr())
+
+            } else {
+
+                this.advance()
+            }
+
+        }
+
+
+        return parameters
+
+    }
+
     parseFactor() {
         while (this.currentNode != null && this.currentNode.type != TT_EOL) {
             if (this.currentNode.type == TT_IDENTIFIER) {
-                return new VarAccessNode(this.currentNode.value)
+                let ID = this.currentNode.value
+                let next = this.program[this.i + 1]
+                if (next != null && next.type == TT_LPAREN) {
+                    this.advance()
+                    let parameters = this.parseParameters()
+                    return new FunctionCallNode(ID, parameters)
+
+                } else {
+                    return new VarAccessNode(ID)
+                }
             }
             else if (this.currentNode.type == TT_INT) {
                 return new NumberNode(this.currentNode.value)
