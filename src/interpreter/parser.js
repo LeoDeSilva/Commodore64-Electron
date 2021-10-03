@@ -1,26 +1,54 @@
 class Parser {
     constructor(program) {
         this.program = program;
-        this.i = 0;
+
         this.lineIndex = 0
-        this.currentNode = this.program[this.i]
+        this.i = 0;
+
+        this.lineNumber = this.program[this.lineIndex].number
+        this.lineTokens = this.program[this.lineIndex].tokens
+        
+        this.currentNode = this.lineTokens[this.i]
     }
 
     advance() {
         this.i++;
-        try {this.currentNode = this.program[this.i]}
+        try {this.currentNode = this.lineTokens[this.i]}
         catch {this.currentNode = null}
     }
 
-    retreat() {
-        this.i--
-        try {this.currentNode = this.program[this.i]}
-        catch {this.currentNode = null}
+    advanceLine(){
+      this.lineIndex ++;
+      try{
+        this.lineNumber = this.program[this.lineIndex].number 
+        this.lineTokens = this.program[this.lineIndex].tokens 
+        this.i = 0
+        this.currentNode = this.lineTokens[this.i]
+      }catch{
+        this.lineNumber = null
+        this.lineTokens = null
+        this.i = null
+        this.currentNode = null
+      }
     }
-
 
     parse() {
+      let program = []  
+      while (this.lineTokens != null){
+        let parsedLine = {
+          number: this.lineNumber,
+          tokens:[]
+        } 
+        while(this.currentNode != null){
+          let curExpr = this.parseExpr()
+          parsedLine.tokens.push(curExpr)
+          this.advance()
+        }
+        program.push(parsedLine) 
+        this.advanceLine()
+      }
 
+      return program
     }
 
     parseOLD() {
@@ -60,7 +88,7 @@ class Parser {
             }
             else {
                 if (this.currentNode.type == TT_IDENTIFIER) {
-                    if (this.program[this.i + 1].type == TT_EQ) {
+                    if (this.lineTokens[this.i + 1].type == TT_EQ) {
                         return this.parseAssignment()
                     }
                 }
@@ -171,7 +199,7 @@ class Parser {
         while (this.currentNode != null && this.currentNode.type != TT_EOL) {
             if (this.currentNode.type == TT_IDENTIFIER) {
                 let ID = this.currentNode.value
-                let next = this.program[this.i + 1]
+                let next = this.lineTokens[this.i + 1]
                 if (next != null && next.type == TT_LPAREN) {
                     this.advance()
                     let parameters = this.parseParameters()

@@ -126,7 +126,8 @@ class Lexer {
 
             lineProg.tokens.push(new Token(TT_EOL, ":"))
 
-            program[this.lineNumber] = lineProg
+            // program[this.lineNumber] = lineProg
+            program.push(lineProg)
             this.advanceLine()
         }
 
