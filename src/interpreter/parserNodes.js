@@ -3,7 +3,7 @@
 class ProgramNode {
     constructor(exprs = null) {
         this.type = "PROGRAM"
-        this.exprs = exprs;
+        this.exprs = exprs
     }
 }
 
@@ -62,8 +62,19 @@ class FunctionCallNode {
 
 class IfNode {
   constructor(start, end, conditions){
-    this.start = start,
-    this.end = end,
-    this.conditions = conditions,
+    this.start = start
+    this.end = end
+    this.conditions = conditions
+  }
+}
+
+//{
+//  seperator = null 
+//  comp = 
+//}
+
+class ConditionNode {
+  constructor(prog){
+    this.conditions = prog
   }
 }

@@ -46,6 +46,7 @@ class Parser {
           tokens:[]
         } 
         while(this.currentNode != null){
+          if (this.currentNode.type == TT_EOL){break}
           let curExpr = this.parseExpr()
           parsedLine.tokens.push(curExpr)
           this.advance()
@@ -98,6 +99,54 @@ class Parser {
     }
 
     parseIf(){
+      let start = this.lineNumber
+      let end = null
+      let conditions = this.parseConditions()
+      this.advance()
+
+      if (!this.currentNode.matches(TT_KEYWORD, "THEN")){
+        output("EXPECTED THEN FOLLOWING IF STATEMENT, LINE " + this.lineNumber)
+        return null
+      }
+      this.advance()
+
+      return new IfNode(start, end, conditions)
+    } 
+
+    parseConditions() {
+        let conditions = new ConditionNode([])
+        let seperators = ["AND","OR"]
+        this.advance()
+
+        if (this.currentNode.type == TT_RPAREN) {
+            return conditions
+        }
+
+        conditions.conditions.push(
+          {
+            seperator: "AND",
+            conditions: this.parseComp()
+          }
+        )
+
+        let compExpr = null
+        let currentSeperator = null
+
+        while (this.currentNode != null && this.currentNode.type != TT_RPAREN && this.currentNode.type != TT_EOL) {
+            let isSeperator =  seperators.includes(this.currentNode.value)
+
+            if (!isSeperator) {
+                conditions.conditions.push({
+                  seperator: currentSeperator,
+                  conditions: this.parseComp()
+                })
+            } else {
+                currentSeperator = this.currentNode.value
+                this.advance()
+            }
+        }
+
+        return conditions
 
     }
 
@@ -167,7 +216,6 @@ class Parser {
 
     parseComp(){
       if (this.currentNode.type == TT_NOT){
-        console.log("NOT")
         this.advance()
         return new UnaryOpNode(TT_NOT, this.parseComp())
       }else{
@@ -175,10 +223,8 @@ class Parser {
 
         let isComp = TT_COMPS.includes(this.currentNode.type)
         if (!isComp){
-          console.log("NOT COMP")
           return null
         }
-        console.log(this.currentNode.type)
         let op = this.currentNode.type
 
         this.advance()
