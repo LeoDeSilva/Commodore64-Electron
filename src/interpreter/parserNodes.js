@@ -60,3 +60,10 @@ class FunctionCallNode {
     }
 }
 
+class IfNode {
+  constructor(start, end, conditions){
+    this.start = start,
+    this.end = end,
+    this.conditions = conditions,
+  }
+}

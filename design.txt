@@ -1,23 +1,54 @@
-# Include Line numers:
+# TODO
+- [ ] comp statement
+  - [ ] isComp()
+- [ ] IF (comp {AND/OR comp}) THEN prog ENDIF
+- [ ] FOR ID = arith To arith (STEP arith) THEN prog NEXT ID
+- [ ] FUNC
 
-## Parser + Lexer
-{ 
-    lineNumber:INT,
-    nodes: Node[]
-}
+10 FUNC LOOP(n) THEN
+20 FOR I = 0 TO n THEN   
+30 PRINT(I)
+40 NEXT I 
+50 END LOOP
 
-prog = {
-    "10": lineTokens,
-}
+func_decs = {
+    LOOP: {line:10, parameters:n}
+  }
 
-while lineIndex < lines.length:
-    tokens = []
+if_statement = [
+  IF:start=10, end=null
+  IF:start=12, end=null // remove once parsed
+]
 
-    while curentTok != null:
-        tokens.push(lex())
-        advance()
+10 IF (10==10 AND 1!=2) THEN 
+20 PRINT("HELLO WORLD")
+30 END IF
 
-    prog[lines[lineIndex].number] = tokens 
-    advanceLine()
-    
+parsed_lines = [
+    10 : funcCall,
+    20 : funcDef,
+    30 : funcCall,
+    40 : emptyNode, 
+    50 : for i 
+    60 : func call 
+    70 : next i 
+    80 : for i 
+    90 : if 
+    100 : if
+    110 : endif 
+    120 : endif 
+    130 : next i
+  ]
+
+  next i #1 
+  loop through parsed_lines in reverse order and find a for statement which matches said ID
+
+
+  // look at parsed lines and find 
+
+10 FuncDeclarationNode = {start: 10, end:50, id=LOOP, parameters=n}
+20 ForNode = {start:20, end:50, step=1, id=i, range_start=0, range_end=10}
+30 funcNode(id=PRINT, parameters=i)
+40 next(goto=10, step=1, id=I, range_start=0, range_end=10)
+50 emptyNode(type=END, id=LOOP)
 

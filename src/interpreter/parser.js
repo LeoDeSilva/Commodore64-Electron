@@ -1,6 +1,7 @@
 class Parser {
     constructor(program) {
         this.program = program;
+        this.parsedProgram = []
 
         this.lineIndex = 0
         this.i = 0;
@@ -13,6 +14,12 @@ class Parser {
 
     advance() {
         this.i++;
+        try {this.currentNode = this.lineTokens[this.i]}
+        catch {this.currentNode = null}
+    }
+
+    retreat() {
+        this.i--
         try {this.currentNode = this.lineTokens[this.i]}
         catch {this.currentNode = null}
     }
@@ -33,7 +40,6 @@ class Parser {
     }
 
     parse() {
-      let program = []  
       while (this.lineTokens != null){
         let parsedLine = {
           number: this.lineNumber,
@@ -44,24 +50,11 @@ class Parser {
           parsedLine.tokens.push(curExpr)
           this.advance()
         }
-        program.push(parsedLine) 
+        this.parsedProgram.push(parsedLine) 
         this.advanceLine()
       }
 
-      return program
-    }
-
-    parseOLD() {
-        let ast = new ProgramNode([])
-
-        while (this.currentNode != null) {
-            let curExpr = this.parseExpr()
-            ast.exprs.push(curExpr)
-
-            this.advance()
-        }
-
-        return ast
+      return this.parsedProgram
     }
 
     parseExpr() {
@@ -85,6 +78,11 @@ class Parser {
                     this.advance()
                     return new FunctionCallNode("GOTO", parameters)
                 }
+
+                if (this.currentNode.matches(TT_KEYWORD, "IF")) {
+                  this.advance()
+                  return this.parseIf()
+                }
             }
             else {
                 if (this.currentNode.type == TT_IDENTIFIER) {
@@ -97,6 +95,10 @@ class Parser {
 
             }
         }
+    }
+
+    parseIf(){
+
     }
 
     parseAssignment() {
@@ -117,9 +119,26 @@ class Parser {
 
         this.advance()
 
-        let var_expr = this.parseArith()
-        return new VarAssignNode(var_name, var_expr)
+        let expr = null
+        if(this.isComp()){
+           expr = this.parseComp()
+        }else{
+          expr = this.parseArith()
+        }
+        return new VarAssignNode(var_name, expr)
 
+    }
+
+    isComp(){
+      // 1*3+2 > 2+2 :
+      // loop through statemnt if find TT_COMP before LPARENT OF EOL then it must be a comparison 
+      for (let i = this.i; i < this.lineTokens.length; i++){
+        let curToken = this.lineTokens[i]
+        if (TT_COMPS.includes(curToken.type)){
+          return true
+        }
+      }
+      return false
     }
 
     parseArith() {
@@ -144,6 +163,28 @@ class Parser {
         else {
             return termA
         }
+    }
+
+    parseComp(){
+      if (this.currentNode.type == TT_NOT){
+        console.log("NOT")
+        this.advance()
+        return new UnaryOpNode(TT_NOT, this.parseComp())
+      }else{
+        let arithA = this.parseArith()
+
+        let isComp = TT_COMPS.includes(this.currentNode.type)
+        if (!isComp){
+          console.log("NOT COMP")
+          return null
+        }
+        console.log(this.currentNode.type)
+        let op = this.currentNode.type
+
+        this.advance()
+        let arithB = this.parseArith()
+        return new BinOpNode(arithA, op,arithB)
+      }
     }
 
     parseTerm() {

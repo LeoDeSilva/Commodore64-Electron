@@ -1,13 +1,13 @@
 prog : [expr]
 
-expr : KEY {ID EQ expr}
+expr : KEY {ID EQ arith | comp}
      : IF (comp {AND/OR comp}) THEN prog ENDIF
-     : FOR ID = arith TO arith (STEP arith) prog NEXT ID 
+     : FOR ID = arith TO arith (STEP arith) THEN prog NEXT ID 
+     : FUNC ID({arith}) THEN prog END ID
      : GOTO arith
      : arith
      
 arith : term {(+/-) term}
-      : comp {(AND | OR) comp}
 
 term : factor {(* / /) factor} 
 
@@ -16,13 +16,10 @@ factor : INT
        : ID
        : (expr)
        : - factor
-       : ID(arith,arith)
+       : ID({arith})
 
 comp : (NOT) comp 
      : arith (EE|GE|LE|GTE|LTE) arith
-
-
-
 
 prog : expr*
 

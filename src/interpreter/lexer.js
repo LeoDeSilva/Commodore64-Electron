@@ -27,6 +27,8 @@ let TT_COMMA = "COMMA"
 let TT_EOF = "EOF"
 let TT_EOL = "EOL"
 
+let TT_COMPS = [TT_EE,TT_NE,TT_LT,TT_GT,TT_LTE,TT_GTE] 
+
 let KEYWORDS = [
     "VAR",
     "IF",
@@ -160,8 +162,7 @@ class Lexer {
             return new Token(TT_RSQUARE, this.currentChar)
         }
         else if (this.currentChar == "!") {
-            return new Token(TT_NOT, this.currentChar)
-        }
+            return this.makeComparison("!")       }
         else if (this.currentChar == ">") {
             return this.makeComparison(">")
         }
@@ -294,15 +295,17 @@ class Lexer {
     }
 
     makeComparison(char) {
-        this.advance()
-        if (this.currentChar == "=") {
+        if (this.line[this.index+1] == "=") {
+            this.advance()
             if (char == ">") {return new Token(TT_GTE, ">=")}
             else if (char == "<") {return new Token(TT_LTE, "<=")}
             else if (char == "=") {return new Token(TT_EE, "==")}
+            else if (char == "!") {return new Token(TT_NE, "!=")}
         } else {
             if (char == ">") {return new Token(TT_GT, ">")}
             else if (char == "<") {return new Token(TT_LT, "<")}
             else if (char == "=") {return new Token(TT_EQ, "=")}
+            else if (char == "!") {return new Token(TT_NOT, "!")}
         }
     }
 
