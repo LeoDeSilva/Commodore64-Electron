@@ -47,23 +47,16 @@ class Parser {
           number: this.lineNumber,
           tokens:[]
         } 
+
         while(this.currentNode != null){
           if (this.currentNode.type == TT_EOL){break}
+
           let curExpr = this.parseExpr()
           parsedLine.tokens.push(curExpr)
 
           if (this.currentNode != null) {
             if(this.currentNode.type != TT_EOL){
-              let prog = new ProgramNode([])
-              while(this.currentNode != null && this.currentNode.type != TT_EOL){
-                if (this.currentNode.type != TT_TMP){
-                  let expr = this.parseExpr()
-                  parsedLine.tokens.push(expr)
-                } else{
-                  this.advance()
-                }
-              } 
-
+              parsedLine.tokens.push(...this.parseMultiline())
             }
           }
         }
@@ -71,9 +64,20 @@ class Parser {
         this.advanceLine()
       }
 
-      console.log(this.ifStatements)
-
       return this.parsedProgram
+    }
+
+    parseMultiline(){
+      let tokens = []
+      while(this.currentNode != null && this.currentNode.type != TT_EOL){
+        if (this.currentNode.type != TT_TMP){
+          let expr = this.parseExpr()
+          tokens.push(expr)
+        } else{
+          this.advance()
+        }
+      } 
+      return tokens
     }
 
     parseExpr() {
@@ -101,17 +105,23 @@ class Parser {
                 else if (this.currentNode.matches(TT_KEYWORD, "IF")) {
                   this.advance()
                   let IfStatement = this.parseIf()
+                  // ONLY PUSH IF PROG = NULL
                   this.ifStatements.push(IfStatement)
                   return IfStatement
                 }
 
                 else if(this.currentNode.matches(TT_KEYWORD, "ENDIF")){
-                  let correspondingStatement = this.ifStatements.pop()
-                  correspondingStatement.end = this.lineNumber
+                  this.ifStatements.pop().end = this.lineNumber
                   this.advance()
                   return new EmptyNode("ENDIF")
                 }
+
+                else if(this.currentNode.matches(TT_KEYWORD, "END")){
+                  this.advance()
+                  return new EmptyNode("END")
+                }
             }
+
             else {
                 if (this.currentNode.type == TT_IDENTIFIER) {
                     if (this.lineTokens[this.i + 1].type == TT_EQ) {
@@ -120,14 +130,12 @@ class Parser {
                 }
 
                 return this.parseArith()
-
             }
         }
     }
 
     parseIf(){
       let start = this.lineNumber
-      let end = null
       let conditions = this.parseConditions()
       this.advance()
 
@@ -138,19 +146,11 @@ class Parser {
       this.advance()
 
       if(this.currentNode != null && this.currentNode.type != TT_EOL){
-        let prog = new ProgramNode([])
-        while(this.currentNode != null && this.currentNode.type != TT_EOL){
-          if (this.currentNode.type != TT_TMP){
-            let expr = this.parseExpr()
-            prog.exprs.push(expr)
-          }else{
-            this.advance()
-          }
-        } 
+        let prog = new ProgramNode(this.parseMultiline())
         return new IfNode(start, start, conditions, prog)
       }
 
-      return new IfNode(start, end, conditions)
+      return new IfNode(start, null, conditions)
     } 
 
     parseConditions() {
@@ -181,6 +181,7 @@ class Parser {
                     seperator: currentSeperator,
                     conditions: this.parseComp()
                   })
+
               } else {
                   currentSeperator = this.currentNode.value
                   this.advance()
@@ -222,8 +223,6 @@ class Parser {
     }
 
     isComp(){
-      // 1*3+2 > 2+2 :
-      // loop through statemnt if find TT_COMP before LPARENT OF EOL then it must be a comparison 
       for (let i = this.i; i < this.lineTokens.length; i++){
         let curToken = this.lineTokens[i]
         if (TT_COMPS.includes(curToken.type)){
