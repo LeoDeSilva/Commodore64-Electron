@@ -60,6 +60,8 @@ class FunctionCallNode {
     }
 }
 
+// JUMP TO END IF CONDITION = FALSE
+
 class IfNode {
   constructor(start, end, conditions, prog=null){
     this.start = start
@@ -72,5 +74,11 @@ class IfNode {
 class ConditionNode {
   constructor(prog){
     this.conditions = prog
+  }
+}
+
+class EmptyNode {
+  constructor(type){
+    this.type = type
   }
 }

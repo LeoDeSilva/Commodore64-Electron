@@ -3,6 +3,8 @@ class Parser {
         this.program = program;
         this.parsedProgram = []
 
+        this.ifStatements = []
+
         this.lineIndex = 0
         this.i = 0;
 
@@ -69,6 +71,8 @@ class Parser {
         this.advanceLine()
       }
 
+      console.log(this.ifStatements)
+
       return this.parsedProgram
     }
 
@@ -80,7 +84,7 @@ class Parser {
                     return this.parseAssignment()
                 }
 
-                if (this.currentNode.matches(TT_KEYWORD, "GOTO")) {
+                else if (this.currentNode.matches(TT_KEYWORD, "GOTO")) {
                     let parameters = []
                     this.advance()
 
@@ -94,9 +98,18 @@ class Parser {
                     return new FunctionCallNode("GOTO", parameters)
                 }
 
-                if (this.currentNode.matches(TT_KEYWORD, "IF")) {
+                else if (this.currentNode.matches(TT_KEYWORD, "IF")) {
                   this.advance()
-                  return this.parseIf()
+                  let IfStatement = this.parseIf()
+                  this.ifStatements.push(IfStatement)
+                  return IfStatement
+                }
+
+                else if(this.currentNode.matches(TT_KEYWORD, "ENDIF")){
+                  let correspondingStatement = this.ifStatements.pop()
+                  correspondingStatement.end = this.lineNumber
+                  this.advance()
+                  return new EmptyNode("ENDIF")
                 }
             }
             else {
@@ -124,7 +137,7 @@ class Parser {
       }
       this.advance()
 
-      if(this.currentNode.type != TT_EOL){
+      if(this.currentNode != null && this.currentNode.type != TT_EOL){
         let prog = new ProgramNode([])
         while(this.currentNode != null && this.currentNode.type != TT_EOL){
           if (this.currentNode.type != TT_TMP){
@@ -159,18 +172,21 @@ class Parser {
         let compExpr = null
         let currentSeperator = null
 
-        while (this.currentNode != null && this.currentNode.type != TT_RPAREN && this.currentNode.type != TT_EOL) {
-            let isSeperator =  seperators.includes(this.currentNode.value)
+        if(this.currentNode == null){
+          while (this.currentNode != null && this.currentNode.type != TT_RPAREN && this.currentNode.type != TT_EOL) {
+              let isSeperator =  seperators.includes(this.currentNode.value)
 
-            if (!isSeperator) {
-                conditions.conditions.push({
-                  seperator: currentSeperator,
-                  conditions: this.parseComp()
-                })
-            } else {
-                currentSeperator = this.currentNode.value
-                this.advance()
-            }
+              if (!isSeperator) {
+                  conditions.conditions.push({
+                    seperator: currentSeperator,
+                    conditions: this.parseComp()
+                  })
+              } else {
+                  currentSeperator = this.currentNode.value
+                  this.advance()
+              }
+          }
+
         }
 
         return conditions

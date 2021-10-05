@@ -42,7 +42,8 @@ let KEYWORDS = [
     "STEP",
     "NEXT",
     "GOTO",
-    "END"
+    "END",
+    "ENDIF"
 ]
 
 
