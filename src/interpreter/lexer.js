@@ -26,6 +26,7 @@ let TT_NOT = "NOT"
 let TT_COMMA = "COMMA"
 let TT_EOF = "EOF"
 let TT_EOL = "EOL"
+let TT_TMP = "TMP"
 
 let TT_COMPS = [TT_EE,TT_NE,TT_LT,TT_GT,TT_LTE,TT_GTE] 
 
@@ -181,6 +182,9 @@ class Lexer {
         else if (this.currentChar == ":") {
             this.advanceLine()
             return new Token(TT_EOL, ":")
+        }
+        else if (this.currentChar == ";"){
+            return new Token(TT_TMP,";")
         }
 
         else if (this.currentChar == '"' || this.currentChar == "'") {

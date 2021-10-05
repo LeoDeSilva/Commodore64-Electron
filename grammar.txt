@@ -1,7 +1,7 @@
 prog : [expr]
 
 expr : KEY {ID EQ arith | comp}
-     : IF (comp {AND/OR comp}) THEN prog ENDIF
+     : IF (comp {AND/OR comp}) THEN {IF not EOL then prog} {prog ENDIF}
      : FOR ID = arith TO arith (STEP arith) THEN prog NEXT ID 
      : FUNC ID({arith}) THEN prog END ID
      : GOTO arith

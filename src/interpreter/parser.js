@@ -49,7 +49,21 @@ class Parser {
           if (this.currentNode.type == TT_EOL){break}
           let curExpr = this.parseExpr()
           parsedLine.tokens.push(curExpr)
-          this.advance()
+
+          if (this.currentNode != null) {
+            if(this.currentNode.type != TT_EOL){
+              let prog = new ProgramNode([])
+              while(this.currentNode != null && this.currentNode.type != TT_EOL){
+                if (this.currentNode.type != TT_TMP){
+                  let expr = this.parseExpr()
+                  parsedLine.tokens.push(expr)
+                } else{
+                  this.advance()
+                }
+              } 
+
+            }
+          }
         }
         this.parsedProgram.push(parsedLine) 
         this.advanceLine()
@@ -109,6 +123,19 @@ class Parser {
         return null
       }
       this.advance()
+
+      if(this.currentNode.type != TT_EOL){
+        let prog = new ProgramNode([])
+        while(this.currentNode != null && this.currentNode.type != TT_EOL){
+          if (this.currentNode.type != TT_TMP){
+            let expr = this.parseExpr()
+            prog.exprs.push(expr)
+          }else{
+            this.advance()
+          }
+        } 
+        return new IfNode(start, start, conditions, prog)
+      }
 
       return new IfNode(start, end, conditions)
     } 
