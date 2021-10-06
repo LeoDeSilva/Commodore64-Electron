@@ -4,6 +4,7 @@ class Parser {
         this.parsedProgram = []
 
         this.ifStatements = []
+        this.funcStatements = []
 
         this.lineIndex = 0
         this.i = 0;
@@ -67,18 +68,6 @@ class Parser {
       return this.parsedProgram
     }
 
-    parseMultiline(){
-      let tokens = []
-      while(this.currentNode != null && this.currentNode.type != TT_EOL){
-        if (this.currentNode.type != TT_TMP){
-          let expr = this.parseExpr()
-          tokens.push(expr)
-        } else{
-          this.advance()
-        }
-      } 
-      return tokens
-    }
 
     parseExpr() {
         while (this.currentNode != null && this.currentNode.type != TT_EOL) {
@@ -105,10 +94,31 @@ class Parser {
                 else if (this.currentNode.matches(TT_KEYWORD, "IF")) {
                   this.advance()
                   let IfStatement = this.parseIf()
-                  // ONLY PUSH IF PROG = NULL
-                  this.ifStatements.push(IfStatement)
+
+                  if (IfStatement.prog == null){
+                    this.ifStatements.push(IfStatement)
+                  }
+
                   return IfStatement
                 }
+
+                else if (this.currentNode.matches(TT_KEYWORD, "FUNC")) {
+                  this.advance()
+                  let funcStatement = this.parseFunc()
+
+                  if (funcStatement.prog == null){
+                    this.funcStatements.push(funcStatement)
+                  }
+
+                  return funcStatement
+                }
+
+                else if(this.currentNode.matches(TT_KEYWORD,"ENDFUNC")){
+                  this.funcStatements.pop().end = this.lineNumber
+                  this.advance()
+                  return new EmptyNode("ENDFUNC")
+                }
+
 
                 else if(this.currentNode.matches(TT_KEYWORD, "ENDIF")){
                   this.ifStatements.pop().end = this.lineNumber
@@ -153,6 +163,53 @@ class Parser {
       return new IfNode(start, null, conditions)
     } 
 
+    parseFunc(){
+      // FUNC ID(param) THEN peod ENDFUNC
+      // constructor(identifier, parameters, prog=null, start, end=null,){
+      let start = this.lineNumber
+
+      if (this.currentNode.type != TT_IDENTIFIER) {
+        output("EXPECTED IDENTIFIER, LINE " + this.lineNumber)
+        return null
+      }
+
+      let identifier = this.currentNode.value
+
+      this.advance()
+
+      let parameters = this.parseParameters()
+
+      this.advance()
+
+      if (!this.currentNode.matches(TT_KEYWORD,"THEN")){
+        output("EXPECTED THEN, LINE" + this.lineNumber)
+        return null
+      }
+
+      this.advance()
+      
+      if(this.currentNode != null && this.currentNode.type != TT_EOL){
+        let prog = new ProgramNode(this.parseMultiline())
+        return new FuncNode(identifier, parameters, prog, start, start)
+      }
+
+      return new FuncNode(identifier, parameters, null, start, null)
+
+    } 
+
+    parseMultiline(){
+      let tokens = []
+      while(this.currentNode != null && this.currentNode.type != TT_EOL){
+        if (this.currentNode.type != TT_TMP){
+          let expr = this.parseExpr()
+          tokens.push(expr)
+        } else{
+          this.advance()
+        }
+      } 
+      return tokens
+    }
+
     parseConditions() {
         let conditions = new ConditionNode([])
         let seperators = ["AND","OR"]
@@ -172,7 +229,7 @@ class Parser {
         let compExpr = null
         let currentSeperator = null
 
-        if(this.currentNode == null){
+        if(this.currentNode != null){
           while (this.currentNode != null && this.currentNode.type != TT_RPAREN && this.currentNode.type != TT_EOL) {
               let isSeperator =  seperators.includes(this.currentNode.value)
 

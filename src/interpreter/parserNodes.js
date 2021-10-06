@@ -71,6 +71,16 @@ class IfNode {
   }
 }
 
+class FuncNode {
+  constructor(identifier, parameters, prog=null, start, end=null,){
+    this.identifier = identifier
+    this.parameters = parameters
+    this.prog = prog
+    this.start = start
+    this.end = end
+  }
+}
+
 class ConditionNode {
   constructor(prog){
     this.conditions = prog

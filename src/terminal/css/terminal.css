@@ -72,4 +72,6 @@ input, [contenteditable]{
     color: var(--terminal-alt);
 }
 
-
+.cmd{
+  word-wrap: break-word !important; 
+};

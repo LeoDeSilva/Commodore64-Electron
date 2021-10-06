@@ -36,14 +36,15 @@ let KEYWORDS = [
     "THEN",
     "AND",
     "OR",
-    "NOT",
     "FOR",
     "TO",
     "STEP",
     "NEXT",
     "GOTO",
     "END",
-    "ENDIF"
+    "ENDIF",
+    "FUNC",
+    "ENDFUNC"
 ]
 
 
