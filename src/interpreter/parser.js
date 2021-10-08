@@ -151,6 +151,16 @@ class Parser {
                   this.advance()
                   return new EmptyNode("END")
                 }
+
+                else if(this.currentNode.matches(TT_KEYWORD,"RETURN")){
+                  this.advance()
+                  return new EmptyNode("RETURN")
+                }
+
+                else if(this.currentNode.matches(TT_KEYWORD,"BREAK")){
+                  this.advance()
+                  return new EmptyNode("BREAK")
+                }
             }
 
             else {
@@ -192,7 +202,7 @@ class Parser {
       this.advance()
       let arithB = this.parseArith()
 
-      let step = 1
+      let step = new NumberNode(1)
 
       if(this.currentNode.matches(TT_KEYWORD,"STEP")){
         this.advance()
