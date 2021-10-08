@@ -151,6 +151,16 @@ class Parser {
                     this.advance()
                     return new EmptyNode("END")
                 }
+
+                else if(this.currentNode.matches(TT_KEYWORD,"RETURN")){
+                  this.advance()
+                  return new EmptyNode("RETURN")
+                }
+
+                else if(this.currentNode.matches(TT_KEYWORD,"BREAK")){
+                  this.advance()
+                  return new EmptyNode("BREAK")
+                }
             }
 
             else {
@@ -184,10 +194,14 @@ class Parser {
         this.advance()
         let arithA = this.parseArith()
 
+<<<<<<< HEAD
         if (!this.currentNode.matches(TT_KEYWORD, "TO")) {
             output("EXPECTED TO, FOR STATEMENT, LINE " + this.lineNumber)
             return null
         }
+=======
+      let step = new NumberNode(1)
+>>>>>>> af7711505d892d7b37983a3ea04f733bf08104a8
 
         this.advance()
         let arithB = this.parseArith()

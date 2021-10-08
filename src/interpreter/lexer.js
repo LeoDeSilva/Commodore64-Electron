@@ -44,7 +44,10 @@ let KEYWORDS = [
     "END",
     "ENDIF",
     "FUNC",
-    "ENDFUNC"
+    "ENDFUNC",
+    "RETURN",
+    "BREAK",
+    "CONTINUE"
 ]
 
 
