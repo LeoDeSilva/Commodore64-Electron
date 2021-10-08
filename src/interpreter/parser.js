@@ -5,14 +5,14 @@ class Parser {
 
         this.ifStatements = []
         this.funcStatements = []
-        this.forStatements  = []
+        this.forStatements = []
 
         this.lineIndex = 0
         this.i = 0;
 
         this.lineNumber = this.program[this.lineIndex].number
         this.lineTokens = this.program[this.lineIndex].tokens
-        
+
         this.currentNode = this.lineTokens[this.i]
     }
 
@@ -28,45 +28,45 @@ class Parser {
         catch {this.currentNode = null}
     }
 
-    advanceLine(){
-      this.lineIndex ++;
-      try{
-        this.lineNumber = this.program[this.lineIndex].number 
-        this.lineTokens = this.program[this.lineIndex].tokens 
-        this.i = 0
-        this.currentNode = this.lineTokens[this.i]
-      }catch{
-        this.lineNumber = null
-        this.lineTokens = null
-        this.i = null
-        this.currentNode = null
-      }
+    advanceLine() {
+        this.lineIndex++;
+        try {
+            this.lineNumber = this.program[this.lineIndex].number
+            this.lineTokens = this.program[this.lineIndex].tokens
+            this.i = 0
+            this.currentNode = this.lineTokens[this.i]
+        } catch {
+            this.lineNumber = null
+            this.lineTokens = null
+            this.i = null
+            this.currentNode = null
+        }
     }
 
     parse() {
-      while (this.lineTokens != null){
-        let parsedLine = {
-          number: this.lineNumber,
-          tokens:[]
-        } 
-
-        while(this.currentNode != null){
-          if (this.currentNode.type == TT_EOL){break}
-
-          let curExpr = this.parseExpr()
-          parsedLine.tokens.push(curExpr)
-
-          if (this.currentNode != null) {
-            if(this.currentNode.type != TT_EOL){
-              parsedLine.tokens.push(...this.parseMultiline())
+        while (this.lineTokens != null) {
+            let parsedLine = {
+                number: this.lineNumber,
+                tokens: []
             }
-          }
-        }
-        this.parsedProgram.push(parsedLine) 
-        this.advanceLine()
-      }
 
-      return this.parsedProgram
+            while (this.currentNode != null) {
+                if (this.currentNode.type == TT_EOL) {break}
+
+                let curExpr = this.parseExpr()
+                parsedLine.tokens.push(curExpr)
+
+                if (this.currentNode != null) {
+                    if (this.currentNode.type != TT_EOL) {
+                        parsedLine.tokens.push(...this.parseMultiline())
+                    }
+                }
+            }
+            this.parsedProgram.push(parsedLine)
+            this.advanceLine()
+        }
+
+        return this.parsedProgram
     }
 
 
@@ -93,63 +93,63 @@ class Parser {
                 }
 
                 else if (this.currentNode.matches(TT_KEYWORD, "IF")) {
-                  this.advance()
-                  let IfStatement = this.parseIf()
+                    this.advance()
+                    let IfStatement = this.parseIf()
 
-                  if (IfStatement.prog == null){
-                    this.ifStatements.push(IfStatement)
-                  }
+                    if (IfStatement.prog == null) {
+                        this.ifStatements.push(IfStatement)
+                    }
 
-                  return IfStatement
+                    return IfStatement
                 }
 
                 else if (this.currentNode.matches(TT_KEYWORD, "FUNC")) {
-                  this.advance()
-                  let funcStatement = this.parseFunc()
+                    this.advance()
+                    let funcStatement = this.parseFunc()
 
-                  if (funcStatement.prog == null){
-                    this.funcStatements.push(funcStatement)
-                  }
+                    if (funcStatement.prog == null) {
+                        this.funcStatements.push(funcStatement)
+                    }
 
-                  return funcStatement
+                    return funcStatement
                 }
 
-                else if (this.currentNode.matches(TT_KEYWORD,"FOR")){
-                  this.advance()
-                  let forStatement = this.parseFor()
+                else if (this.currentNode.matches(TT_KEYWORD, "FOR")) {
+                    this.advance()
+                    let forStatement = this.parseFor()
 
-                  if (forStatement.prog == null){
-                    this.forStatements.push(forStatement)
-                  }
+                    if (forStatement.prog == null) {
+                        this.forStatements.push(forStatement)
+                    }
 
-                  return forStatement
+                    return forStatement
 
                 }
 
-                else if(this.currentNode.matches(TT_KEYWORD, "NEXT")){
-                  let forStatement = this.forStatements[this.forStatements.length - 1]
-                  forStatement.end = this.lineNumber
-                  this.forStatements.pop()
-                  this.advance()
-                  return new EndForNode(forStatement.identifier, forStatement.range_start, forStatement.range_end,forStatement.step, forStatement.start)
+                else if (this.currentNode.matches(TT_KEYWORD, "NEXT")) {
+                    let forStatement = this.forStatements[this.forStatements.length - 1]
+                    forStatement.end = this.lineNumber
+                    this.forStatements.pop()
+                    this.advance()
+                    return new EndForNode(forStatement.identifier, forStatement.range_start, forStatement.range_end, forStatement.step, forStatement.start)
                 }
 
-                else if(this.currentNode.matches(TT_KEYWORD,"ENDFUNC")){
-                  this.funcStatements.pop().end = this.lineNumber
-                  this.advance()
-                  return new EmptyNode("ENDFUNC")
+                else if (this.currentNode.matches(TT_KEYWORD, "ENDFUNC")) {
+                    this.funcStatements.pop().end = this.lineNumber
+                    this.advance()
+                    return new EmptyNode("ENDFUNC")
                 }
 
 
-                else if(this.currentNode.matches(TT_KEYWORD, "ENDIF")){
-                  this.ifStatements.pop().end = this.lineNumber
-                  this.advance()
-                  return new EmptyNode("ENDIF")
+                else if (this.currentNode.matches(TT_KEYWORD, "ENDIF")) {
+                    this.ifStatements.pop().end = this.lineNumber
+                    this.advance()
+                    return new EmptyNode("ENDIF")
                 }
 
-                else if(this.currentNode.matches(TT_KEYWORD, "END")){
-                  this.advance()
-                  return new EmptyNode("END")
+                else if (this.currentNode.matches(TT_KEYWORD, "END")) {
+                    this.advance()
+                    return new EmptyNode("END")
                 }
             }
 
@@ -165,124 +165,124 @@ class Parser {
         }
     }
 
-    parseFor(){
-      let start = this.lineNumber
-      
-      if(this.currentNode.type != TT_IDENTIFIER){
-        output("EXPECTED IDENTIFIER, FOR STATEMENT, LINE " + this.lineNumber)
-        return null
-      }
+    parseFor() {
+        let start = this.lineNumber
 
-      let identifier = this.currentNode.value
-      this.advance()
+        if (this.currentNode.type != TT_IDENTIFIER) {
+            output("EXPECTED IDENTIFIER, FOR STATEMENT, LINE " + this.lineNumber)
+            return null
+        }
 
-      if (this.currentNode.type != TT_EQ){
-        output("EXPECTED EQUALS, FOR STATEMENT, LINE " + this.lineNumber)
-        return null
-      }
-
-      this.advance()
-      let arithA = this.parseArith()
-
-      if(!this.currentNode.matches(TT_KEYWORD, "TO")){
-        output("EXPECTED TO, FOR STATEMENT, LINE " + this.lineNumber)
-        return null
-      }
-
-      this.advance()
-      let arithB = this.parseArith()
-
-      let step = 1
-
-      if(this.currentNode.matches(TT_KEYWORD,"STEP")){
+        let identifier = this.currentNode.value
         this.advance()
-        step = this.parseArith()
-      }
+
+        if (this.currentNode.type != TT_EQ) {
+            output("EXPECTED EQUALS, FOR STATEMENT, LINE " + this.lineNumber)
+            return null
+        }
+
+        this.advance()
+        let arithA = this.parseArith()
+
+        if (!this.currentNode.matches(TT_KEYWORD, "TO")) {
+            output("EXPECTED TO, FOR STATEMENT, LINE " + this.lineNumber)
+            return null
+        }
+
+        this.advance()
+        let arithB = this.parseArith()
+
+        let step = 1
+
+        if (this.currentNode.matches(TT_KEYWORD, "STEP")) {
+            this.advance()
+            step = this.parseArith()
+        }
 
 
-      if(!this.currentNode.matches(TT_KEYWORD,"THEN")){
-        output("EXPECTED THEN, FOR STATEMENT, LINE " + this.lineNumber)
-        return null
-      }
+        if (!this.currentNode.matches(TT_KEYWORD, "THEN")) {
+            output("EXPECTED THEN, FOR STATEMENT, LINE " + this.lineNumber)
+            return null
+        }
 
-      this.advance()
+        this.advance()
 
-      if(this.currentNode != null && this.currentNode.type != TT_EOL){
-        let prog = new ProgramNode(this.parseMultiline())
-        return new ForNode(identifier,arithA,arithB,step,prog,start,start)
-      }
+        if (this.currentNode != null && this.currentNode.type != TT_EOL) {
+            let prog = new ProgramNode(this.parseMultiline())
+            return new ForNode(identifier, arithA, arithB, step, prog, start, start)
+        }
 
-      return new ForNode(identifier,arithA,arithB,step,null,start,null)
+        return new ForNode(identifier, arithA, arithB, step, null, start, null)
 
     }
 
-    parseIf(){
-      let start = this.lineNumber
-      let conditions = this.parseConditions()
-      this.advance()
+    parseIf() {
+        let start = this.lineNumber
+        let conditions = this.parseConditions()
+        this.advance()
 
-      if (!this.currentNode.matches(TT_KEYWORD, "THEN")){
-        output("EXPECTED THEN FOLLOWING IF STATEMENT, LINE " + this.lineNumber)
-        return null
-      }
-      this.advance()
-
-      if(this.currentNode != null && this.currentNode.type != TT_EOL){
-        let prog = new ProgramNode(this.parseMultiline())
-        return new IfNode(start, start, conditions, prog)
-      }
-
-      return new IfNode(start, null, conditions)
-    } 
-
-    parseFunc(){
-      let start = this.lineNumber
-
-      if (this.currentNode.type != TT_IDENTIFIER) {
-        output("EXPECTED IDENTIFIER, LINE " + this.lineNumber)
-        return null
-      }
-
-      let identifier = this.currentNode.value
-
-      this.advance()
-
-      let parameters = this.parseParameters()
-
-      this.advance()
-
-      if (!this.currentNode.matches(TT_KEYWORD,"THEN")){
-        output("EXPECTED THEN, LINE" + this.lineNumber)
-        return null
-      }
-
-      this.advance()
-      
-      if(this.currentNode != null && this.currentNode.type != TT_EOL){
-        let prog = new ProgramNode(this.parseMultiline())
-        return new FuncNode(identifier, parameters, prog, start, start)
-      }
-
-      return new FuncNode(identifier, parameters, null, start, null)
-
-    } 
-
-    parseMultiline(){
-      let tokens = []
-      while(this.currentNode != null && this.currentNode.type != TT_EOL){
-        if (this.currentNode.type != TT_TMP){
-          let expr = this.parseExpr()
-          tokens.push(expr)
-        } else{
-          this.advance()
+        if (!this.currentNode.matches(TT_KEYWORD, "THEN")) {
+            output("EXPECTED THEN FOLLOWING IF STATEMENT, LINE " + this.lineNumber)
+            return null
         }
-      } 
-      return tokens
+        this.advance()
+
+        if (this.currentNode != null && this.currentNode.type != TT_EOL) {
+            let prog = new ProgramNode(this.parseMultiline())
+            return new IfNode(start, start, conditions, prog)
+        }
+
+        return new IfNode(start, null, conditions)
+    }
+
+    parseFunc() {
+        let start = this.lineNumber
+
+        if (this.currentNode.type != TT_IDENTIFIER) {
+            output("EXPECTED IDENTIFIER, LINE " + this.lineNumber)
+            return null
+        }
+
+        let identifier = this.currentNode.value
+
+        this.advance()
+
+        let parameters = this.parseParameters()
+
+        this.advance()
+
+        if (!this.currentNode.matches(TT_KEYWORD, "THEN")) {
+            output("EXPECTED THEN, LINE" + this.lineNumber)
+            return null
+        }
+
+        this.advance()
+
+        if (this.currentNode != null && this.currentNode.type != TT_EOL) {
+            let prog = new ProgramNode(this.parseMultiline())
+            return new FuncNode(identifier, parameters, prog, start, start)
+        }
+
+        return new FuncNode(identifier, parameters, null, start, null)
+
+    }
+
+    parseMultiline() {
+        let tokens = []
+        while (this.currentNode != null && this.currentNode.type != TT_EOL) {
+            if (this.currentNode.type != TT_TMP) {
+                let expr = this.parseExpr()
+                tokens.push(expr)
+            } else {
+                this.advance()
+            }
+        }
+        return tokens
     }
 
     parseConditions() {
         let conditions = new ConditionNode([])
-        let seperators = ["AND","OR"]
+        let seperators = ["AND", "OR"]
         this.advance()
 
         if (this.currentNode.type == TT_RPAREN) {
@@ -290,30 +290,30 @@ class Parser {
         }
 
         conditions.conditions.push(
-          {
-            seperator: "AND",
-            conditions: this.parseComp()
-          }
+            {
+                seperator: "AND",
+                conditions: this.parseComp()
+            }
         )
 
         let compExpr = null
         let currentSeperator = null
 
-        if(this.currentNode != null){
-          while (this.currentNode != null && this.currentNode.type != TT_RPAREN && this.currentNode.type != TT_EOL) {
-              let isSeperator =  seperators.includes(this.currentNode.value)
+        if (this.currentNode != null) {
+            while (this.currentNode != null && this.currentNode.type != TT_RPAREN && this.currentNode.type != TT_EOL) {
+                let isSeperator = seperators.includes(this.currentNode.value)
 
-              if (!isSeperator) {
-                  conditions.conditions.push({
-                    seperator: currentSeperator,
-                    conditions: this.parseComp()
-                  })
+                if (!isSeperator) {
+                    conditions.conditions.push({
+                        seperator: currentSeperator,
+                        conditions: this.parseComp()
+                    })
 
-              } else {
-                  currentSeperator = this.currentNode.value
-                  this.advance()
-              }
-          }
+                } else {
+                    currentSeperator = this.currentNode.value
+                    this.advance()
+                }
+            }
 
         }
 
@@ -340,23 +340,23 @@ class Parser {
         this.advance()
 
         let expr = null
-        if(this.isComp()){
-           expr = this.parseComp()
-        }else{
-          expr = this.parseArith()
+        if (this.isComp()) {
+            expr = this.parseComp()
+        } else {
+            expr = this.parseArith()
         }
         return new VarAssignNode(var_name, expr)
 
     }
 
-    isComp(){
-      for (let i = this.i; i < this.lineTokens.length; i++){
-        let curToken = this.lineTokens[i]
-        if (TT_COMPS.includes(curToken.type)){
-          return true
+    isComp() {
+        for (let i = this.i; i < this.lineTokens.length; i++) {
+            let curToken = this.lineTokens[i]
+            if (TT_COMPS.includes(curToken.type)) {
+                return true
+            }
         }
-      }
-      return false
+        return false
     }
 
     parseArith() {
@@ -383,23 +383,23 @@ class Parser {
         }
     }
 
-    parseComp(){
-      if (this.currentNode.type == TT_NOT){
-        this.advance()
-        return new UnaryOpNode(TT_NOT, this.parseComp())
-      }else{
-        let arithA = this.parseArith()
+    parseComp() {
+        if (this.currentNode.type == TT_NOT) {
+            this.advance()
+            return new UnaryOpNode(TT_NOT, this.parseComp())
+        } else {
+            let arithA = this.parseArith()
 
-        let isComp = TT_COMPS.includes(this.currentNode.type)
-        if (!isComp){
-          return null
+            let isComp = TT_COMPS.includes(this.currentNode.type)
+            if (!isComp) {
+                return null
+            }
+            let op = this.currentNode.type
+
+            this.advance()
+            let arithB = this.parseArith()
+            return new BinOpNode(arithA, op, arithB)
         }
-        let op = this.currentNode.type
-
-        this.advance()
-        let arithB = this.parseArith()
-        return new BinOpNode(arithA, op,arithB)
-      }
     }
 
     parseTerm() {
