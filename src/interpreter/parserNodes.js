@@ -80,6 +80,29 @@ class FuncNode {
     this.end = end
   }
 }
+ // : FOR ID = arith TO arith (STEP arith) THEN prog NEXT ID 
+
+class ForNode {
+  constructor(identifier, range_start, range_end, step=1, prog=null, start, end){
+    this.identifier = identifier
+    this.range_start = range_start 
+    this.range_end = range_end 
+    this.step = step 
+    this.prog = prog
+    this.start = start 
+    this.end = end
+  }
+}
+
+class EndForNode {
+  constructor(identifier, range_start, range_end, step=1, goto){
+    this.identifier = identifier
+    this.range_start = range_start 
+    this.range_end = range_end 
+    this.step = step 
+    this.goto = goto
+  }
+}
 
 class ConditionNode {
   constructor(prog){

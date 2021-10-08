@@ -5,6 +5,7 @@ class Parser {
 
         this.ifStatements = []
         this.funcStatements = []
+        this.forStatements  = []
 
         this.lineIndex = 0
         this.i = 0;
@@ -113,6 +114,26 @@ class Parser {
                   return funcStatement
                 }
 
+                else if (this.currentNode.matches(TT_KEYWORD,"FOR")){
+                  this.advance()
+                  let forStatement = this.parseFor()
+
+                  if (forStatement.prog == null){
+                    this.forStatements.push(forStatement)
+                  }
+
+                  return forStatement
+
+                }
+
+                else if(this.currentNode.matches(TT_KEYWORD, "NEXT")){
+                  let forStatement = this.forStatements[this.forStatements.length - 1]
+                  forStatement.end = this.lineNumber
+                  this.forStatements.pop()
+                  this.advance()
+                  return new EndForNode(forStatement.identifier, forStatement.range_start, forStatement.range_end,forStatement.step, forStatement.start)
+                }
+
                 else if(this.currentNode.matches(TT_KEYWORD,"ENDFUNC")){
                   this.funcStatements.pop().end = this.lineNumber
                   this.advance()
@@ -144,6 +165,57 @@ class Parser {
         }
     }
 
+    parseFor(){
+      let start = this.lineNumber
+      
+      if(this.currentNode.type != TT_IDENTIFIER){
+        output("EXPECTED IDENTIFIER, FOR STATEMENT, LINE " + this.lineNumber)
+        return null
+      }
+
+      let identifier = this.currentNode.value
+      this.advance()
+
+      if (this.currentNode.type != TT_EQ){
+        output("EXPECTED EQUALS, FOR STATEMENT, LINE " + this.lineNumber)
+        return null
+      }
+
+      this.advance()
+      let arithA = this.parseArith()
+
+      if(!this.currentNode.matches(TT_KEYWORD, "TO")){
+        output("EXPECTED TO, FOR STATEMENT, LINE " + this.lineNumber)
+        return null
+      }
+
+      this.advance()
+      let arithB = this.parseArith()
+
+      let step = 1
+
+      if(this.currentNode.matches(TT_KEYWORD,"STEP")){
+        this.advance()
+        step = this.parseArith()
+      }
+
+
+      if(!this.currentNode.matches(TT_KEYWORD,"THEN")){
+        output("EXPECTED THEN, FOR STATEMENT, LINE " + this.lineNumber)
+        return null
+      }
+
+      this.advance()
+
+      if(this.currentNode != null && this.currentNode.type != TT_EOL){
+        let prog = new ProgramNode(this.parseMultiline())
+        return new ForNode(identifier,arithA,arithB,step,prog,start,start)
+      }
+
+      return new ForNode(identifier,arithA,arithB,step,null,start,null)
+
+    }
+
     parseIf(){
       let start = this.lineNumber
       let conditions = this.parseConditions()
@@ -164,8 +236,6 @@ class Parser {
     } 
 
     parseFunc(){
-      // FUNC ID(param) THEN peod ENDFUNC
-      // constructor(identifier, parameters, prog=null, start, end=null,){
       let start = this.lineNumber
 
       if (this.currentNode.type != TT_IDENTIFIER) {
