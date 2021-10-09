@@ -14,10 +14,4 @@ A recreation of the Comador 64 terminal interface in electron JS NOT AN EMULATOR
 - QUIT - enter termial mode 
 - RUN - run program and enter terminal mode
 
-## Todo:
-- [x] Fix recursive decent parse infinite recursion bug
-- [x] Implement brackets and order of operations in parser
-- [ ] Implement control flow and function calls in parser
-- [ ] write interpreter
-
 
