@@ -1,5 +1,7 @@
 # Commodore64-Electron
-A recreation of the Comador 64 terminal interface in electron JS NOT AN EMULATOR
+A recreation of the Comador 64 terminal interface in electron JS (90% sure this is now broken)
+![image](https://user-images.githubusercontent.com/46300158/210255143-e0db305d-e2bf-47f1-acaa-1e9ddf3cee1f.png)
+
 
 ## Commands
 
